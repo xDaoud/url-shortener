@@ -8,6 +8,7 @@ public class ShortLink {
         this.url = url;
         this.hash = hash;
     }
+    public ShortLink() {}
     public long getId() {
         return id;
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Objects;
 
 @Repository
 public class ShortLinkRepository {
@@ -26,8 +27,13 @@ public class ShortLinkRepository {
             return ps;
         }, keyHolder);
 
-        long id = keyHolder.getKey().longValue();
+        long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
         shortLink.setId(id);
         return shortLink;
+    }
+
+    public ShortLink findByHash(String hash) {
+        String sql = "SELECT * FROM short_links WHERE hash = ?";
+        return jdbcTemplate.queryForObject(sql, new ShortLinkRowMapper(), hash);
     }
 }
