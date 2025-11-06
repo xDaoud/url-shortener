@@ -27,7 +27,7 @@ public class ShortLinkService {
 
     public ShortLink createShortLink(String originalUrl) {
         String baseHash = generateHash(originalUrl);
-        String finalHash = findUniqueHash(baseHash);
+        String finalHash = findUniqueHash(originalUrl, baseHash);
         ShortLink shortLink = new ShortLink(originalUrl, finalHash);
         shortLinkRepository.save(shortLink);
         return shortLink;
@@ -41,12 +41,16 @@ public class ShortLinkService {
             throw new RuntimeException(e);
         }
     }
-    private String findUniqueHash(String baseHash) {
+    private String findUniqueHash(String originalUrl, String baseHash) {
         String tempHash = baseHash;
         int attempts = 0;
-        while(shortLinkRepository.findByHash(tempHash) != null) {
-            tempHash = baseHash + "-" + attempts;
+        int maxAttempts = 10;
+        while(shortLinkRepository.findByHash(tempHash) != null && attempts < maxAttempts) {
+            tempHash = generateHash(originalUrl + attempts);
             attempts++;
+        }
+        if(attempts >= maxAttempts) {
+            throw new RuntimeException(String.format("Max attempts reached: %d", maxAttempts));
         }
         return tempHash;
     }
