@@ -28,6 +28,4 @@ public class ShortLinkController {
         String hashedUrl = "http://localhost:8080/" + shortLink.getHash();
         return ResponseEntity.created(URI.create(hashedUrl)).body(shortLink);
     }
-
-
 }

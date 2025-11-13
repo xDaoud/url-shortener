@@ -4,4 +4,4 @@ CREATE TABLE IF NOT EXISTS short_links (
   hash VARCHAR(10) NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_short_links_hash ON short_links (hash);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_short_links_hash ON short_links (hash);
