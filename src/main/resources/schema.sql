@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS short_links (
   id BIGSERIAL PRIMARY KEY,
   url TEXT NOT NULL ,
-  hash VARCHAR(10) NOT NULL
+  hash VARCHAR(10)
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_short_links_hash ON short_links (hash);

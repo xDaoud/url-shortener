@@ -2,7 +2,9 @@ package com.xDaoud.url_shortener.service;
 
 import com.xDaoud.url_shortener.model.ShortLink;
 import com.xDaoud.url_shortener.repository.ShortLinkRepository;
+import com.xDaoud.url_shortener.utility.Base62;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,33 +27,17 @@ public class ShortLinkService {
         }
     }
 
+    @Transactional
     public ShortLink createShortLink(String originalUrl) {
-        String baseHash = generateHash(originalUrl);
-        String finalHash = findUniqueHash(originalUrl, baseHash);
-        ShortLink shortLink = new ShortLink(originalUrl, finalHash);
+        ShortLink shortLink = new ShortLink();
+        shortLink.setUrl(originalUrl);
         shortLinkRepository.save(shortLink);
+
+        String shortCode = Base62.encode(shortLink.getId());
+        shortLink.setHash(shortCode);
+        shortLinkRepository.save(shortLink);
+
         return shortLink;
     }
-    private String generateHash(String originalUrl) {
-        String input = originalUrl + System.nanoTime();
-        try {
-            byte[] hash = MessageDigest.getInstance("MD5").digest(input.getBytes());
-            return Base64.getUrlEncoder().encodeToString(hash).substring(0, 8);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    private String findUniqueHash(String originalUrl, String baseHash) {
-        String tempHash = baseHash;
-        int attempts = 0;
-        int maxAttempts = 10;
-        while(shortLinkRepository.findByHash(tempHash) != null && attempts < maxAttempts) {
-            tempHash = generateHash(originalUrl + attempts);
-            attempts++;
-        }
-        if(attempts >= maxAttempts) {
-            throw new RuntimeException(String.format("Max attempts reached: %d", maxAttempts));
-        }
-        return tempHash;
-    }
+
 }
