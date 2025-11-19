@@ -1,6 +1,7 @@
 package com.xDaoud.url_shortener.service;
 
 import com.xDaoud.url_shortener.model.ShortLink;
+import com.xDaoud.url_shortener.repository.IdSequence;
 import com.xDaoud.url_shortener.repository.ShortLinkRepository;
 import com.xDaoud.url_shortener.utility.Base62;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,10 @@ import java.util.Base64;
 @Service
 public class ShortLinkService {
     ShortLinkRepository shortLinkRepository;
-    public ShortLinkService(ShortLinkRepository shortLinkRepository) {
+    IdSequence idSequence;
+    public ShortLinkService(ShortLinkRepository shortLinkRepository, IdSequence idSequence) {
         this.shortLinkRepository = shortLinkRepository;
+        this.idSequence = idSequence;
     }
 
     public String getOriginalUrl(String hash) {
@@ -30,10 +33,10 @@ public class ShortLinkService {
     @Transactional
     public ShortLink createShortLink(String originalUrl) {
         ShortLink shortLink = new ShortLink();
-        shortLink.setUrl(originalUrl);
-        shortLinkRepository.save(shortLink);
+        long id = idSequence.nextId();
+        String shortCode = Base62.encode(id);
 
-        String shortCode = Base62.encode(shortLink.getId());
+        shortLink.setUrl(originalUrl);
         shortLink.setHash(shortCode);
         shortLinkRepository.save(shortLink);
 
