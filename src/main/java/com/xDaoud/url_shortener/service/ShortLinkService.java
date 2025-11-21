@@ -37,7 +37,7 @@ public class ShortLinkService {
             return isFound;
         }
         ShortLink shortLink = new ShortLink();
-        long id = idSequence.nextId();
+        long id = idSequence.nextId() + 1000000;
         String shortCode = Base62.encode(id);
 
         shortLink.setUrl(originalUrl);
