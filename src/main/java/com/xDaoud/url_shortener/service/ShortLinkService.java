@@ -32,6 +32,10 @@ public class ShortLinkService {
 
     @Transactional
     public ShortLink createShortLink(String originalUrl) {
+        ShortLink isFound = shortLinkRepository.findByUrl(originalUrl);
+        if(isFound != null) {
+            return isFound;
+        }
         ShortLink shortLink = new ShortLink();
         long id = idSequence.nextId();
         String shortCode = Base62.encode(id);

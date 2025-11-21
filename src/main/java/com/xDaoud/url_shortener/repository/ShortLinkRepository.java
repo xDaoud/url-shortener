@@ -40,4 +40,13 @@ public class ShortLinkRepository {
             return null;
         }
     }
+
+    public ShortLink findByUrl(String url) {
+        try {
+            String sql = "SELECT * FROM short_links WHERE url = ?";
+            return jdbcTemplate.queryForObject(sql, new ShortLinkRowMapper(), url);
+        }  catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 }
