@@ -7,6 +7,8 @@ import com.xDaoud.url_shortener.utility.Base62;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -32,6 +34,9 @@ public class ShortLinkService {
 
     @Transactional
     public ShortLink createShortLink(String originalUrl) {
+        if(!isValidUrl(originalUrl)) {
+            throw new IllegalArgumentException("url is invalid");
+        }
         ShortLink isFound = shortLinkRepository.findByUrl(originalUrl);
         if(isFound != null) {
             return isFound;
@@ -45,6 +50,19 @@ public class ShortLinkService {
         shortLinkRepository.save(shortLink);
 
         return shortLink;
+    }
+
+    private boolean isValidUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+
+        try {
+            URI uri = new URI(url).parseServerAuthority();
+            return true;
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
 }
